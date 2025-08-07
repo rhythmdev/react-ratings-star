@@ -23,7 +23,7 @@ const Star = ({ fillPercentage, size, fullColor, emptyColor }) => {
   );
 };
 
-// Thee main component you will export
+// The main component for the export
 const Rating = ({
   value = 0,
   max = 5,
@@ -36,11 +36,11 @@ const Rating = ({
   for (let i = 1; i <= max; i++) {
     let fillPercentage;
     if (value >= i) {
-      fillPercentage = 100; // This star is completely full
+      fillPercentage = 100; // Star is completely full
     } else if (value > i - 1) {
-      fillPercentage = (value - (i - 1)) * 100; // This star is partially full
+      fillPercentage = (value - (i - 1)) * 100; // Star is partially full
     } else {
-      fillPercentage = 0; // This star is completely empty
+      fillPercentage = 0; // Star is completely empty
     }
 
     stars.push(
