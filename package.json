@@ -1,31 +1,36 @@
 {
-  "name": "react-ratings-star",
+  "name": "react-ratings-stars",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "A simple React component to display ratings with decimal values (e.g., 4.5 stars).",
+  "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "rimraf dist && npx babel src -d dist --copy-files"
   },
   "keywords": [
-    "react-rating",
-    "react-ratings",
-    "react-rating-star",
-    "react-ratings-star",
-    "react-ratings-star-component"
+    "react",
+    "rating",
+    "stars",
+    "component",
+    "decimal",
+    "half-star",
+    "svg"
   ],
   "author": "Rhythm Biswas",
-  "license": "ISC",
-  "type": "commonjs",
+  "license": "MIT",
+  "peerDependencies": {
+    "react": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0"
+  },
+  "files": [
+    "dist"
+  ],
   "devDependencies": {
     "@babel/cli": "^7.28.0",
     "@babel/preset-env": "^7.28.0",
-    "@babel/preset-react": "^7.27.1"
+    "@babel/preset-react": "^7.27.1",
+    "rimraf": "^6.0.1"
   },
   "dependencies": {
     "glob": "^11.0.3",
     "inflight": "^1.0.6"
-  },
-  "peerDependencies": {
-    "react": "^19.1.1"
   }
 }
