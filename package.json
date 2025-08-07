@@ -29,9 +29,6 @@
     "@babel/preset-env": "^7.28.0",
     "@babel/preset-react": "^7.27.1",
     "rimraf": "^6.0.1"
-  },
-  "dependencies": {
-    "glob": "^11.0.3",
-    "inflight": "^1.0.6"
   }
+ 
 }
