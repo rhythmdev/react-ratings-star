@@ -7,9 +7,10 @@
     "build": "rimraf dist && npx babel src -d dist --copy-files"
   },
   "keywords": [
-    "react",
-    "rating",
-    "stars",
+    "react-rating",
+    "react-ratings",
+    "react-rating-stars",
+    "react-star-rating",
     "component",
     "decimal",
     "half-star",
