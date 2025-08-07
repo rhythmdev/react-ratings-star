@@ -1,6 +1,6 @@
 {
   "name": "react-ratings-star",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A simple React component to display ratings with decimal values (e.g., 4.5 stars).",
   "main": "dist/index.js",
   "scripts": {
@@ -30,5 +30,4 @@
     "@babel/preset-react": "^7.27.1",
     "rimraf": "^6.0.1"
   }
- 
 }
