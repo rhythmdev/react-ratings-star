@@ -39,3 +39,5 @@ function App() {
 | `size`       | `number` | `24`      | The size (height and width) of each star. |
 | `fullColor`  | `string` | `#FFD700` | The color of the filled part of the star. |
 | `emptyColor` | `string` | `#E0E0E0` | The color of the empty part of the star.  |
+
+- `Npm Link` - https://www.npmjs.com/package/react-ratings-star
