@@ -43,6 +43,14 @@ const RatingIcon = ({
   );
 };
 
+// NEW: A helper function to calculate the precise rating based on mouse position.
+const calculateRating = (event, iconValue) => {
+  const rect = event.currentTarget.getBoundingClientRect();
+  const mouseX = event.clientX - rect.left;
+  // If the mouse is in the left half of the icon, return a half-star rating.
+  return mouseX < rect.width / 2 ? iconValue - 0.5 : iconValue;
+};
+
 // This is the primary Rating component, packed with useful features.
 const Rating = ({
   value = 0,
@@ -116,7 +124,13 @@ const Rating = ({
             key={iconValue}
             // Event handlers for mouse interactions.
             onMouseEnter={() => !readOnly && setHoverValue(iconValue)}
-            onClick={() => !readOnly && onRatingChange(iconValue)}
+            onClick={(e) => {
+              if (readOnly) {
+                return;
+              }
+              e.stopPropagation();
+              onRatingChange(iconValue);
+            }}
             style={{ cursor: readOnly ? "default" : "pointer" }}
             title={tooltipText}
           >
