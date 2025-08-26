@@ -43,7 +43,7 @@ const RatingIcon = ({
   );
 };
 
-// NEW: A helper function to calculate the precise rating based on mouse position.
+// Helper function to calculate the precise rating based on mouse position.
 const calculateRating = (event, iconValue) => {
   const rect = event.currentTarget.getBoundingClientRect();
   const mouseX = event.clientX - rect.left;
