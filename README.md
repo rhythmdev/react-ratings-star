@@ -15,7 +15,7 @@ To adjust the appearance, pass your desired values to the `size`, `fullColor` an
 
 ```jsx
 import React from "react";
-import Rating from "react-decimal-stars";
+import Rating from "react-ratings-stars";
 
 function App() {
   return (
