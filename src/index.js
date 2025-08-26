@@ -9,25 +9,25 @@ const RatingIcon = ({
   customIcon,
 }) => {
   // If a custom icon is passed...
+  const IconComponent = customIcon;
   if (customIcon) {
     // Create an element from the custom icon component
-    const customIconElement = React.createElement(customIcon, {
-      size,
-      fillPercentage,
-      fullColor,
-      emptyColor,
-    });
-
-    // Clone the element and inject the required style
-    return cloneElement(customIconElement, {
-      style: {
-        ...customIconElement.props.style, // This keeps the user's original styles
-        pointerEvents: "none", // This adds the style needed for half-star selection
-      },
-    });
+    if (IconComponent) {
+      return (
+        <div
+          style={{
+            color: fullColor,
+            display: "flex",
+            pointerEvents: "none",
+          }}
+        >
+          <IconComponent size={size} />
+        </div>
+      );
+    }
   }
 
-  // If no custom icon, render the default star (which already has the fix)
+  // If no custom icon, render the default star SVG.
   const gradientId = `grad-${Math.random()}`;
   return (
     <svg
@@ -104,9 +104,9 @@ const Rating = ({
 
     let newValue = value;
     if (e.key === "ArrowRight") {
-      newValue = Math.min(max, value + 1);
+      newValue = Math.min(max, value + 0.5);
     } else if (e.key === "ArrowLeft") {
-      newValue = Math.max(0, value - 1);
+      newValue = Math.max(0, value - 0.5);
     }
 
     if (newValue !== value) {
@@ -150,13 +150,9 @@ const Rating = ({
           <div
             key={iconValue}
             // Event handlers for mouse interactions.
-            onMouseEnter={() => !readOnly && setHoverValue(iconValue)}
+            onMouseEnter={(e) => handleMouseEnter(e, iconValue)}
             onClick={(e) => {
-              if (readOnly) {
-                return;
-              }
-              e.stopPropagation();
-              onRatingChange(iconValue);
+              handleClick(e, iconValue);
             }}
             style={{ cursor: readOnly ? "default" : "pointer" }}
             title={tooltipText}

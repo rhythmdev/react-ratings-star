@@ -1,10 +1,19 @@
 {
   "name": "react-ratings-star",
   "version": "1.0.1",
-  "description": "A simple React component to display ratings with decimal values (e.g., 4.5 stars).",
-  "main": "dist/index.js",
+  "description": "A simple React component to display ratings with decimal values (e.g. 4.5 stars).",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
+    }
+  },
   "scripts": {
-    "build": "rimraf dist && npx babel src -d dist --copy-files"
+    "build": "rimraf dist && npm run build:esm && npm run build:cjs",
+    "build:esm": "npx babel src --out-dir dist/esm",
+    "build:cjs": "npx babel src --out-dir dist/cjs --presets=@babel/preset-env"
   },
   "keywords": [
     "react-rating",
