@@ -71,6 +71,24 @@ const Rating = ({
   // Shows either the hover value or the prop value.
   const displayValue = hoverValue ?? value;
 
+  //  Event handlers use the calculateRating helper.
+  const handleMouseEnter = (event, iconValue) => {
+    if (readOnly) return;
+    setHoverValue(calculateRating(event, iconValue));
+  };
+
+  const handleMouseLeave = () => {
+    if (readOnly) return;
+    setHoverValue(null);
+  };
+
+  const handleClick = (event, iconValue) => {
+    if (readOnly) return;
+    event.stopPropagation();
+    const newRating = calculateRating(event, iconValue);
+    onRatingChange(newRating);
+  };
+
   // Handler for keyboard navigation for accessibility.
   const handleKeyDown = (e) => {
     if (readOnly) return;
