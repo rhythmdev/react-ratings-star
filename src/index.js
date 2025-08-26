@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, cloneElement } from "react";
 
 // A customizable icon component that defaults to a star, with the option to substitute any other icon.
 const RatingIcon = ({
@@ -8,25 +8,34 @@ const RatingIcon = ({
   emptyColor,
   customIcon,
 }) => {
-  const IconComponent = customIcon;
+  // If a custom icon is passed...
+  if (customIcon) {
+    // Create an element from the custom icon component
+    const customIconElement = React.createElement(customIcon, {
+      size,
+      fillPercentage,
+      fullColor,
+      emptyColor,
+    });
 
-  // If you pass in a custom icon, it’ll use that — otherwise it falls back to the default star ⭐
-  if (IconComponent) {
-    return (
-      <IconComponent
-        size={size}
-        fillPercentage={fillPercentage}
-        fullColor={fullColor}
-        emptyColor={emptyColor}
-      />
-    );
+    // Clone the element and inject the required style
+    return cloneElement(customIconElement, {
+      style: {
+        ...customIconElement.props.style, // This keeps the user's original styles
+        pointerEvents: "none", // This adds the style needed for half-star selection
+      },
+    });
   }
 
-  // Unique gradient ID to prevent conflicts with multiple ratings.
+  // If no custom icon, render the default star (which already has the fix)
   const gradientId = `grad-${Math.random()}`;
-
   return (
-    <svg height={size} width={size} viewBox="0 0 24 24">
+    <svg
+      height={size}
+      width={size}
+      viewBox="0 0 24 24"
+      style={{ pointerEvents: "none" }}
+    >
       <defs>
         <linearGradient id={gradientId}>
           <stop offset={`${fillPercentage}%`} stopColor={fullColor} />
