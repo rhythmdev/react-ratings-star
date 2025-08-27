@@ -1,11 +1,4 @@
-import React, { useState } from "react";
-
-// Helper function to calculate the precise rating based on mouse position.
-const calculateRating = (event, iconValue) => {
-  const rect = event.currentTarget.getBoundingClientRect();
-  const mouseX = event.clientX - rect.left;
-  return mouseX < rect.width / 2 ? iconValue - 0.5 : iconValue;
-};
+import React, { useState, useRef } from "react";
 
 // The primary Rating component, packed with useful features.
 const Rating = ({
@@ -22,22 +15,33 @@ const Rating = ({
   style = {},
 }) => {
   const [hoverValue, setHoverValue] = useState(null);
-  const displayValue = hoverValue ?? value;
+  const ratingContainerRef = useRef(null);
 
-  // Event handlers use the calculateRating helper.
-  const handleMouseEnter = (event, iconValue) => {
-    if (readOnly) return;
-    setHoverValue(calculateRating(event, iconValue));
+  // Event handlers
+
+  const calculateRating = (e) => {
+    if (!ratingContainerRef.current) return 0;
+    const { width, left } = ratingContainerRef.current.getBoundingClientRect();
+    const mouseX = e.clientX - left;
+    const percent = Math.max(0, Math.min(1, mouseX / width));
+    const rating = Math.ceil(percent * max * 2) / 2;
+    return rating;
   };
+
+  const handleMouseMove = (e) => {
+    if (readOnly) return;
+    setHoverValue(calculateRating(e));
+  };
+
   const handleMouseLeave = () => {
     if (readOnly) return;
     setHoverValue(null);
   };
-  const handleClick = (event, iconValue) => {
+
+  const handleClick = (e) => {
     if (readOnly) return;
-    event.stopPropagation();
-    const newRating = calculateRating(event, iconValue);
-    onRatingChange(newRating);
+    e.stopPropagation();
+    onRatingChange(calculateRating(e));
   };
 
   // Handler for keyboard navigation for accessibility.
@@ -53,6 +57,7 @@ const Rating = ({
       onRatingChange(newValue);
     }
   };
+  const displayValue = hoverValue ?? value;
 
   // Default star path (used if no custom icon is provided)
   const DefaultStar = () => (
@@ -61,6 +66,11 @@ const Rating = ({
 
   return (
     <div
+      ref={ratingContainerRef}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      onClick={handleClick}
+      onKeyDown={handleKeyDown}
       role="slider"
       aria-valuenow={value}
       aria-valuemin={0}
@@ -68,10 +78,14 @@ const Rating = ({
       aria-label="Rating"
       aria-readonly={readOnly}
       tabIndex={readOnly ? -1 : 0}
-      onKeyDown={handleKeyDown}
-      onMouseLeave={handleMouseLeave}
-      style={{ display: "inline-flex", alignItems: "center", ...style }}
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        cursor: readOnly ? "default" : "pointer",
+        ...style,
+      }}
       className={className}
+      title={tooltips[Math.ceil(displayValue) - 1] || `${displayValue} stars`}
     >
       {Array.from({ length: max }, (_, i) => {
         const iconValue = i + 1;
@@ -87,21 +101,9 @@ const Rating = ({
         const gradientId = `grad-${iconValue}-${Math.random()}`;
         const maskId = `mask-${iconValue}-${Math.random()}`;
         const IconComponent = customIcon;
-        const tooltipText =
-          tooltips[i] || `${iconValue} star${iconValue > 1 ? "s" : ""}`;
 
         return (
-          <div
-            key={iconValue}
-            onMouseEnter={(e) => handleMouseEnter(e, iconValue)}
-            onClick={(e) => handleClick(e, iconValue)}
-            style={{
-              cursor: readOnly ? "default" : "pointer",
-              width: size,
-              height: size,
-            }}
-            title={tooltipText}
-          >
+          <div key={iconValue} style={{ width: size, height: size }}>
             <svg height={size} width={size} viewBox="0 0 24 24">
               <defs>
                 <linearGradient id={gradientId}>
@@ -110,9 +112,7 @@ const Rating = ({
                   <stop offset={`${fillPercentage}%`} stopColor={emptyColor} />
                   <stop offset="100%" stopColor={emptyColor} />
                 </linearGradient>
-
                 <mask id={maskId}>
-                  {/* Warping the icon in a <g> tag to force a white fill, making the mask work. */}
                   <g fill="white">
                     {IconComponent ? (
                       <IconComponent size={size} />
@@ -122,7 +122,6 @@ const Rating = ({
                   </g>
                 </mask>
               </defs>
-
               <rect
                 x="0"
                 y="0"
