@@ -1,4 +1,5 @@
 import React, { useRef, useState } from "react";
+import PropTypes from "prop-types";
 
 // The primary Rating component, packed with useful features.
 const Rating = ({
@@ -60,8 +61,9 @@ const Rating = ({
   const displayValue = hoverValue ?? value;
 
   // Tooltip logic
-  const defaultTooltip = `${displayValue.toFixed(1)} out of ${max}`;
-  const finalTooltip = tooltips[Math.ceil(displayValue) - 1] || defaultTooltip;
+   const defaultTooltip = `${displayValue.toFixed(1)} out of ${max}`;
+   const finalTooltip = tooltips[Math.ceil(displayValue) - 1] || defaultTooltip;
+ 
 
   // Default star path (used if no custom icon is provided)
   const DefaultStar = () => (
@@ -93,11 +95,12 @@ const Rating = ({
     >
       {Array.from({ length: max }, (_, i) => {
         const iconValue = i + 1;
+        const finalDisplayValue = Math.min(displayValue, max);
         let fillPercentage;
-        if (displayValue >= iconValue) {
+        if (finalDisplayValue >= iconValue) {
           fillPercentage = 100;
-        } else if (displayValue > i) {
-          fillPercentage = (displayValue - i) * 100;
+        } else if (finalDisplayValue > i) {
+          fillPercentage = (finalDisplayValue - i) * 100;
         } else {
           fillPercentage = 0;
         }
@@ -140,6 +143,20 @@ const Rating = ({
       })}
     </div>
   );
+};
+
+Rating.propTypes = {
+  value: PropTypes.number.isRequired,
+  max: PropTypes.number,
+  onRatingChange: PropTypes.func,
+  readOnly: PropTypes.bool,
+  size: PropTypes.number,
+  fullColor: PropTypes.string,
+  emptyColor: PropTypes.string,
+  customIcon: PropTypes.elementType,
+  tooltips: PropTypes.arrayOf(PropTypes.string),
+  className: PropTypes.string,
+  style: PropTypes.object,
 };
 
 export default Rating;
