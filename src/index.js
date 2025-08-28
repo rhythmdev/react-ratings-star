@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useRef, useState } from "react";
 
 // The primary Rating component, packed with useful features.
 const Rating = ({
@@ -89,7 +89,7 @@ const Rating = ({
         ...style,
       }}
       className={className}
-      title={tooltips[Math.ceil(displayValue) - 1] || `${displayValue} stars`}
+      title={finalTooltip}
     >
       {Array.from({ length: max }, (_, i) => {
         const iconValue = i + 1;
