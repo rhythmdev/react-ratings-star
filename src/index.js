@@ -59,6 +59,10 @@ const Rating = ({
   };
   const displayValue = hoverValue ?? value;
 
+  // Tooltip logic
+  const defaultTooltip = `${displayValue.toFixed(1)} out of ${max}`;
+  const finalTooltip = tooltips[Math.ceil(displayValue) - 1] || defaultTooltip;
+
   // Default star path (used if no custom icon is provided)
   const DefaultStar = () => (
     <path d="M12 .587l3.668 7.429 8.207 1.192-5.938 5.787 1.401 8.17L12 18.897l-7.338 3.856 1.401-8.17L.125 9.208l8.207-1.192L12 .587z" />
