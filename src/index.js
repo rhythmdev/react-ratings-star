@@ -169,15 +169,19 @@ const Rating = ({
 
   return (
     <div
-      ref={ratingContainerRef}
+      ref={containerRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       onClick={handleClick}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
       onKeyDown={handleKeyDown}
       role="slider"
-      aria-valuenow={value}
+      aria-valuenow={Number(value)}
       aria-valuemin={0}
       aria-valuemax={max}
+      aria-valuetext={ariaValueText}
       aria-label="Rating"
       aria-readonly={readOnly}
       tabIndex={readOnly ? -1 : 0}
@@ -185,50 +189,60 @@ const Rating = ({
         display: "inline-flex",
         alignItems: "center",
         cursor: readOnly ? "default" : "pointer",
+        userSelect: "none",
         ...style,
       }}
       className={className}
       title={finalTooltip}
     >
-      {Array.from({ length: max }, (_, i) => {
-        const iconValue = i + 1;
-        const finalDisplayValue = Math.min(displayValue, max);
-        let fillPercentage;
-        if (finalDisplayValue >= iconValue) {
-          fillPercentage = 100;
-        } else if (finalDisplayValue > i) {
-          fillPercentage = (finalDisplayValue - i) * 100;
-        } else {
-          fillPercentage = 0;
+      {Array.from({ length: max }, (_, index) => {
+        const starNumber = index + 1;
+        const isFullyFilled = displayValue >= starNumber;
+        const isPartiallyFilled =
+          displayValue > index && displayValue < starNumber;
+
+        // Calculate how much to fill this star (0-100%)
+        let fillAmount = 0;
+        if (isFullyFilled) {
+          fillAmount = 100;
+        } else if (isPartiallyFilled) {
+          fillAmount = (displayValue - index) * 100;
         }
 
-        const gradientId = `grad-${iconValue}-${Math.random()}`;
-        const maskId = `mask-${iconValue}-${Math.random()}`;
-        const IconComponent = customIcon;
+        // Use stable IDs that won't change on every render
+        const gradientId = `star-gradient-${uniqueId}-${starNumber}`;
+        const maskId = `star-mask-${uniqueId}-${starNumber}`;
 
         return (
-          <div key={iconValue} style={{ width: size, height: size }}>
+          <div
+            key={starNumber}
+            style={{
+              width: size,
+              height: size,
+              display: "inline-block",
+            }}
+            aria-hidden="true" // Screen readers don't need each star
+          >
             <svg height={size} width={size} viewBox="0 0 24 24">
               <defs>
+                {/* Create a color gradient for filled/unfilled parts */}
                 <linearGradient id={gradientId}>
                   <stop offset="0%" stopColor={fullColor} />
-                  <stop offset={`${fillPercentage}%`} stopColor={fullColor} />
-                  <stop offset={`${fillPercentage}%`} stopColor={emptyColor} />
+                  <stop offset={`${fillAmount}%`} stopColor={fullColor} />
+                  <stop offset={`${fillAmount}%`} stopColor={emptyColor} />
                   <stop offset="100%" stopColor={emptyColor} />
                 </linearGradient>
+
+                {/* Create a mask in the shape of a star */}
                 <mask id={maskId}>
                   <g fill="white">
-                    {IconComponent ? (
-                      <IconComponent size={size} />
-                    ) : (
-                      <DefaultStar />
-                    )}
+                    {customIcon ? customIcon : <DefaultStar />}
                   </g>
                 </mask>
               </defs>
+
+              {/* Fill the rectangle with gradient but only show the star shape */}
               <rect
-                x="0"
-                y="0"
                 width="100%"
                 height="100%"
                 fill={`url(#${gradientId})`}
