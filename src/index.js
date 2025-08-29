@@ -1,5 +1,5 @@
-import React, { useRef, useState } from "react";
 import PropTypes from "prop-types";
+import React, { useRef, useState } from "react";
 
 // The primary Rating component, packed with useful features.
 const Rating = ({
@@ -14,6 +14,7 @@ const Rating = ({
   tooltips = [],
   className = "",
   style = {},
+  rounding = "ceil",
 }) => {
   const [hoverValue, setHoverValue] = useState(null);
   const [isTouching, setIsTouching] = useState(false);
@@ -29,8 +30,8 @@ const Rating = ({
   // };
 
   const calculateRatingFromClientX = (clientX) => {
-    if (!containerRef.current) return 0;
-    const { width, left } = containerRef.current.getBoundingClientRect();
+    if (!ratingContainerRef.current) return 0;
+    const { width, left } = ratingContainerRef.current.getBoundingClientRect();
     let percent = (clientX - left) / width;
     percent = Math.max(0, Math.min(1, percent));
     const raw = percent * max;
@@ -142,6 +143,8 @@ const Rating = ({
 
   const defaultTooltip = `${formattedValue} out of ${max}`;
 
+  let finalTooltip;
+
   // Checking for custom tooltips
   if (tooltips) {
     const halfStepIndex = displayValue * 2 - 1;
@@ -167,9 +170,11 @@ const Rating = ({
     <path d="M12 .587l3.668 7.429 8.207 1.192-5.938 5.787 1.401 8.17L12 18.897l-7.338 3.856 1.401-8.17L.125 9.208l8.207-1.192L12 .587z" />
   );
 
+  const uniqueId = React.useId();
+
   return (
     <div
-      ref={containerRef}
+      ref={ratingContainerRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       onClick={handleClick}
