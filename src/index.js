@@ -135,11 +135,32 @@ const Rating = ({
     if (newValue !== value) onRatingChange(newValue);
   };
 
-  const displayValue = hoverValue ?? value;
-
   // Tooltip logic
-  const defaultTooltip = `${displayValue} out of ${max}`;
-  const finalTooltip = tooltips[Math.ceil(displayValue) - 1] || defaultTooltip;
+  const displayValue = hoverValue ?? value;
+  const formattedValue =
+    displayValue % 1 === 0 ? displayValue : displayValue.toFixed(1);
+
+  const defaultTooltip = `${formattedValue} out of ${max}`;
+
+  // Checking for custom tooltips
+  if (tooltips) {
+    const halfStepIndex = displayValue * 2 - 1;
+    const tooltipIndex = Math.round(halfStepIndex); // Round to the nearest index
+
+    // If the calculated index is valid and a tooltip exists
+    if (tooltipIndex >= 0 && tooltips[tooltipIndex]) {
+      finalTooltip = tooltips[tooltipIndex];
+    } else {
+      // If no custom tooltip is found, fall back to the default
+      finalTooltip = defaultTooltip;
+    }
+  } else {
+    // If no custom tooltips are provided, just use the default
+    finalTooltip = defaultTooltip;
+  }
+
+  // For screen readers
+  const ariaValueText = finalTooltip;
 
   // Default star path (used if no custom icon is provided)
   const DefaultStar = () => (
