@@ -69,8 +69,20 @@ const Rating = ({
     if (readOnly) return;
     setIsTouching(true);
     if (e.touches?.[0]) {
-      setHoverValue(calculateRating(e.touches[0].e));
+      setHoverValue(calculateRatingFromClientX(e.touches[0].clientX));
     }
+  };
+  const handleTouchMove = (e) => {
+    if (readOnly) return;
+    if (e.touches?.[0]) {
+      setHoverValue(calculateRatingFromClientX(e.touches[0].clientX));
+    }
+  };
+  const handleTouchEnd = (e) => {
+    if (readOnly) return;
+    setIsTouching(false);
+    if (hoverValue !== null) onRatingChange(hoverValue);
+    setHoverValue(null);
   };
 
   // Handler for keyboard navigation for accessibility.
