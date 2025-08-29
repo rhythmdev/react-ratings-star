@@ -86,18 +86,55 @@ const Rating = ({
   };
 
   // Handler for keyboard navigation for accessibility.
+  // const handleKeyDown = (e) => {
+  //   if (readOnly) return;
+  //   let newValue = value;
+  //   if (e.key === "ArrowRight") {
+  //     newValue = Math.min(max, value + 0.5);
+  //   } else if (e.key === "ArrowLeft") {
+  //     newValue = Math.max(0, value - 0.5);
+  //   }
+  //   if (newValue !== value) {
+  //     onRatingChange(newValue);
+  //   }
+  // };
+
   const handleKeyDown = (e) => {
     if (readOnly) return;
     let newValue = value;
-    if (e.key === "ArrowRight") {
-      newValue = Math.min(max, value + 0.5);
-    } else if (e.key === "ArrowLeft") {
-      newValue = Math.max(0, value - 0.5);
+    const step = 0.5;
+    switch (e.key) {
+      case "ArrowRight":
+      case "ArrowUp":
+        newValue = Math.min(max, +(value + step).toFixed(2));
+        break;
+      case "ArrowLeft":
+      case "ArrowDown":
+        newValue = Math.max(0, +(value - step).toFixed(2));
+        break;
+      case "Home":
+        newValue = 0;
+        break;
+      case "End":
+        newValue = max;
+        break;
+      case "PageUp":
+        newValue = Math.min(max, +(value + 1).toFixed(2));
+        break;
+      case "PageDown":
+        newValue = Math.max(0, +(value - 1).toFixed(2));
+        break;
+      case "Enter":
+      case " ":
+        // keep current value;
+        break;
+      default:
+        return;
     }
-    if (newValue !== value) {
-      onRatingChange(newValue);
-    }
+    e.preventDefault();
+    if (newValue !== value) onRatingChange(newValue);
   };
+
   const displayValue = hoverValue ?? value;
 
   // Tooltip logic
