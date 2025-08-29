@@ -16,33 +16,61 @@ const Rating = ({
   style = {},
 }) => {
   const [hoverValue, setHoverValue] = useState(null);
+  const [isTouching, setIsTouching] = useState(false);
   const ratingContainerRef = useRef(null);
 
-  // Event handlers
+  // const calculateRating = (e) => {
+  //   if (!ratingContainerRef.current) return 0;
+  //   const { width, left } = ratingContainerRef.current.getBoundingClientRect();
+  //   const mouseX = e.clientX - left;
+  //   const percent = Math.max(0, Math.min(1, mouseX / width));
+  //   const rating = Math.ceil(percent * max * 2) / 2;
+  //   return rating;
+  // };
 
-  const calculateRating = (e) => {
-    if (!ratingContainerRef.current) return 0;
-    const { width, left } = ratingContainerRef.current.getBoundingClientRect();
-    const mouseX = e.clientX - left;
-    const percent = Math.max(0, Math.min(1, mouseX / width));
-    const rating = Math.ceil(percent * max * 2) / 2;
-    return rating;
+  const calculateRatingFromClientX = (clientX) => {
+    if (!containerRef.current) return 0;
+    const { width, left } = containerRef.current.getBoundingClientRect();
+    let percent = (clientX - left) / width;
+    percent = Math.max(0, Math.min(1, percent));
+    const raw = percent * max;
+
+    let rating;
+    if (rounding === "nearest") {
+      rating = Math.round(raw * 2) / 2;
+    } else if (rounding === "floor") {
+      rating = Math.floor(raw * 2) / 2;
+    } else {
+      rating = Math.ceil(raw * 2) / 2;
+    }
+
+    return Math.max(0, Math.min(max, +rating.toFixed(2)));
   };
 
+  // Event handlers
   const handleMouseMove = (e) => {
-    if (readOnly) return;
-    setHoverValue(calculateRating(e));
+    if (readOnly || isTouching) return;
+    setHoverValue(calculateRatingFromClientX(e.clientX));
   };
 
   const handleMouseLeave = () => {
-    if (readOnly) return;
+    if (readOnly || isTouching) return;
     setHoverValue(null);
   };
 
   const handleClick = (e) => {
     if (readOnly) return;
     e.stopPropagation();
-    onRatingChange(calculateRating(e));
+    onRatingChange(calculateRatingFromClientX(e.clientX));
+  };
+
+  // Touch handlers for mobile
+  const handleTouchStart = (e) => {
+    if (readOnly) return;
+    setIsTouching(true);
+    if (e.touches?.[0]) {
+      setHoverValue(calculateRating(e.touches[0].e));
+    }
   };
 
   // Handler for keyboard navigation for accessibility.
