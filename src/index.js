@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useId } from "react";
 
 // The primary Rating component, packed with useful features.
 const Rating = ({
@@ -19,15 +19,9 @@ const Rating = ({
   const [hoverValue, setHoverValue] = useState(null);
   const [isTouching, setIsTouching] = useState(false);
   const ratingContainerRef = useRef(null);
+  const uniqueId = useId();
 
-  // const calculateRating = (e) => {
-  //   if (!ratingContainerRef.current) return 0;
-  //   const { width, left } = ratingContainerRef.current.getBoundingClientRect();
-  //   const mouseX = e.clientX - left;
-  //   const percent = Math.max(0, Math.min(1, mouseX / width));
-  //   const rating = Math.ceil(percent * max * 2) / 2;
-  //   return rating;
-  // };
+  // Calculate rating based on mouse/touch position
 
   const calculateRatingFromClientX = (clientX) => {
     if (!ratingContainerRef.current) return 0;
@@ -48,7 +42,10 @@ const Rating = ({
     return Math.max(0, Math.min(max, +rating.toFixed(2)));
   };
 
-  // Event handlers
+  // --- Event handlers ---
+
+  //* Mouse handlers for the smooth hover effect
+
   const handleMouseMove = (e) => {
     if (readOnly || isTouching) return;
     setHoverValue(calculateRatingFromClientX(e.clientX));
@@ -65,7 +62,8 @@ const Rating = ({
     onRatingChange(calculateRatingFromClientX(e.clientX));
   };
 
-  // Touch handlers for mobile
+  //* Handlers for a smooth mobile touch experience.
+
   const handleTouchStart = (e) => {
     if (readOnly) return;
     setIsTouching(true);
@@ -86,19 +84,7 @@ const Rating = ({
     setHoverValue(null);
   };
 
-  // Handler for keyboard navigation for accessibility.
-  // const handleKeyDown = (e) => {
-  //   if (readOnly) return;
-  //   let newValue = value;
-  //   if (e.key === "ArrowRight") {
-  //     newValue = Math.min(max, value + 0.5);
-  //   } else if (e.key === "ArrowLeft") {
-  //     newValue = Math.max(0, value - 0.5);
-  //   }
-  //   if (newValue !== value) {
-  //     onRatingChange(newValue);
-  //   }
-  // };
+  //* Handlers for keyboard navigation for accessibility.
 
   const handleKeyDown = (e) => {
     if (readOnly) return;
@@ -136,31 +122,18 @@ const Rating = ({
     if (newValue !== value) onRatingChange(newValue);
   };
 
-  // Tooltip logic
+  //* --- Value & Tooltip Calculation ---
+
   const displayValue = hoverValue ?? value;
+
   const formattedValue =
     displayValue % 1 === 0 ? displayValue : displayValue.toFixed(1);
-
-  const defaultTooltip = `${formattedValue} out of ${max}`;
-
-  let finalTooltip;
-
-  // Checking for custom tooltips
-  if (tooltips) {
-    const halfStepIndex = displayValue * 2 - 1;
-    const tooltipIndex = Math.round(halfStepIndex); // Round to the nearest index
-
-    // If the calculated index is valid and a tooltip exists
-    if (tooltipIndex >= 0 && tooltips[tooltipIndex]) {
-      finalTooltip = tooltips[tooltipIndex];
-    } else {
-      // If no custom tooltip is found, fall back to the default
-      finalTooltip = defaultTooltip;
-    }
-  } else {
-    // If no custom tooltips are provided, just use the default
-    finalTooltip = defaultTooltip;
-  }
+  const numericTooltip = `${formattedValue} out of ${max}`;
+  const descriptiveIndex = Math.ceil(displayValue) - 1;
+  const descriptiveText = tooltips[descriptiveIndex];
+  const finalTooltip = descriptiveText
+    ? `${formattedValue} - ${descriptiveText}`
+    : numericTooltip;
 
   // For screen readers
   const ariaValueText = finalTooltip;
@@ -170,7 +143,7 @@ const Rating = ({
     <path d="M12 .587l3.668 7.429 8.207 1.192-5.938 5.787 1.401 8.17L12 18.897l-7.338 3.856 1.401-8.17L.125 9.208l8.207-1.192L12 .587z" />
   );
 
-  const uniqueId = React.useId();
+  const IconComponent = customIcon;
 
   return (
     <div
@@ -200,54 +173,51 @@ const Rating = ({
       className={className}
       title={finalTooltip}
     >
-      {Array.from({ length: max }, (_, index) => {
-        const starNumber = index + 1;
-        const isFullyFilled = displayValue >= starNumber;
-        const isPartiallyFilled =
-          displayValue > index && displayValue < starNumber;
-
-        // Calculate how much to fill this star (0-100%)
-        let fillAmount = 0;
-        if (isFullyFilled) {
-          fillAmount = 100;
-        } else if (isPartiallyFilled) {
-          fillAmount = (displayValue - index) * 100;
+      {Array.from({ length: max }, (_, i) => {
+        const iconValue = i + 1;
+        const effectiveDisplayValue = Math.min(displayValue, max);
+        let fillPercentage;
+        if (effectiveDisplayValue >= iconValue) {
+          fillPercentage = 100;
+        } else if (effectiveDisplayValue > i) {
+          fillPercentage = (effectiveDisplayValue - i) * 100;
+        } else {
+          fillPercentage = 0;
         }
 
-        // Use stable IDs that won't change on every render
-        const gradientId = `star-gradient-${uniqueId}-${starNumber}`;
-        const maskId = `star-mask-${uniqueId}-${starNumber}`;
+        // FIX: Use the stable uniqueId to create flicker-free SVG IDs.
+        const gradientId = `grad-${uniqueId}-${iconValue}`;
+        const maskId = `mask-${uniqueId}-${iconValue}`;
 
         return (
           <div
-            key={starNumber}
-            style={{
-              width: size,
-              height: size,
-              display: "inline-block",
-            }}
-            aria-hidden="true" // Screen readers don't need each star
+            key={iconValue}
+            style={{ width: size, height: size }}
+            // ACCESSIBILITY: Hides decorative stars from screen readers.
+            aria-hidden="true"
           >
             <svg height={size} width={size} viewBox="0 0 24 24">
               <defs>
-                {/* Create a color gradient for filled/unfilled parts */}
                 <linearGradient id={gradientId}>
                   <stop offset="0%" stopColor={fullColor} />
-                  <stop offset={`${fillAmount}%`} stopColor={fullColor} />
-                  <stop offset={`${fillAmount}%`} stopColor={emptyColor} />
+                  <stop offset={`${fillPercentage}%`} stopColor={fullColor} />
+                  <stop offset={`${fillPercentage}%`} stopColor={emptyColor} />
                   <stop offset="100%" stopColor={emptyColor} />
                 </linearGradient>
-
-                {/* Create a mask in the shape of a star */}
                 <mask id={maskId}>
+                  {/* FIX: Forces the mask to be a solid stencil, making custom icons visible and correctly colored. */}
                   <g fill="white">
-                    {customIcon ? customIcon : <DefaultStar />}
+                    {IconComponent ? (
+                      <IconComponent size={size} />
+                    ) : (
+                      <DefaultStar />
+                    )}
                   </g>
                 </mask>
               </defs>
-
-              {/* Fill the rectangle with gradient but only show the star shape */}
               <rect
+                x="0"
+                y="0"
                 width="100%"
                 height="100%"
                 fill={`url(#${gradientId})`}
@@ -273,6 +243,7 @@ Rating.propTypes = {
   tooltips: PropTypes.arrayOf(PropTypes.string),
   className: PropTypes.string,
   style: PropTypes.object,
+  rounding: PropTypes.oneOf(["ceil", "floor", "nearest"]),
 };
 
 export default Rating;
