@@ -113,7 +113,6 @@ const Rating = ({
         break;
       case "Enter":
       case " ":
-        // keep current value;
         break;
       default:
         return;
@@ -193,7 +192,6 @@ const Rating = ({
           <div
             key={iconValue}
             style={{ width: size, height: size }}
-            // ACCESSIBILITY: Hides decorative stars from screen readers.
             aria-hidden="true"
           >
             <svg height={size} width={size} viewBox="0 0 24 24">
@@ -205,7 +203,6 @@ const Rating = ({
                   <stop offset="100%" stopColor={emptyColor} />
                 </linearGradient>
                 <mask id={maskId}>
-                  {/* FIX: Forces the mask to be a solid stencil, making custom icons visible and correctly colored. */}
                   <g fill="white">
                     {IconComponent ? (
                       <IconComponent size={size} />
