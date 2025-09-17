@@ -1,7 +1,12 @@
 {
   "name": "react-ratings-star",
   "version": "1.0.1",
-  "description": "A simple React component to display ratings with decimal values (e.g. 4.5 stars).",
+  "description": "A fully customizable, interactive, and accessible rating component for React.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rhythmdev/react-ratings-star.git"
+  },
+  "homepage": "https://github.com/rhythmdev/react-ratings-star#readme",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
   "exports": {
