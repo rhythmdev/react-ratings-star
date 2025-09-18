@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+---
+
+## [2.0.1] - 2025-09-18
+### Fixed
+- A critical bug where the component would crash if the `value` prop was `null`, `undefined`, or a `string` from a database. The component now safely handles these cases.
+
 ## [2.0.0] - 2025-09-18
 
 This is a major rewrite of the component, transforming it from a simple display tool into a fully interactive, customizable, and accessible library.
