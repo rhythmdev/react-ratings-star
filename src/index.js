@@ -123,7 +123,7 @@ const Rating = ({
 
   //* --- Value & Tooltip Calculation ---
 
-  const displayValue = hoverValue ?? value;
+  const displayValue = hoverValue ?? Number(value) ?? 0;
 
   const formattedValue =
     displayValue % 1 === 0 ? displayValue : displayValue.toFixed(1);
@@ -155,7 +155,7 @@ const Rating = ({
       onTouchEnd={handleTouchEnd}
       onKeyDown={handleKeyDown}
       role="slider"
-      aria-valuenow={Number(value)}
+      aria-valuenow={Number(value) ?? 0}
       aria-valuemin={0}
       aria-valuemax={max}
       aria-valuetext={ariaValueText}
